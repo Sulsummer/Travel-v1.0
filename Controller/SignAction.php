@@ -1,5 +1,5 @@
 <?php
-	include("../Demo/Tourist.php");
+	include_once("../Demo/Tourist.php");
 	
 	$act = $_GET["act"];
 	$tourist = new \Demo\Tourist();
@@ -20,7 +20,7 @@
 		$password = $_POST["sign-in-password"];
 		if($tourist ->signIn($email,$password)){
 			setcookie("email",$email,time()+3600*7*24,"/");
-			header("Location:../View/user.php?email=$email");
+			header("Location:../View/selfpage.php?email=$email");
 		}
 		else
 			echo "f";

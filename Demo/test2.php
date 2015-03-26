@@ -15,14 +15,27 @@
 	use Demo\Message;
 	include_once("../Demo/Apply.php");
 	use Demo\Apply;
+	include_once("../Demo/Picture.php");
+	use Demo\Picture;
 
-	//$u = new User("sulsummer@hotmail.com");
-	//$u -> withdrawGroup("2");
+?>
+<html>
+<body>
 
-	$flag1= false;
-	$flag2= true;
-
-	$f= $flag1 || $flag2;
-	var_dump($f);
+<form action="test3.php" method="post"
+enctype="multipart/form-data">
+<label for="file">Filename:</label>
+<input type="file" name="file" id="file" /> 
+<br />
+<input type="text" name="filename"/>
+<input type="submit" name="submit" value="Submit" />
+</form>
+<form action="test3.php" method="post">
+	<textarea name="note"></textarea>
+	<input type="submit" name="sub" value="sub"/>
+</form>
+</body>
+</html>
+<?php
 
 ?>

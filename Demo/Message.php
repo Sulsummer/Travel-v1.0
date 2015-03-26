@@ -2,6 +2,7 @@
 namespace Demo;
 include_once("../Configuration/MySQL.php");
 use Configuration\MySQL;
+include_once("User.php");
 
 class Message{
 
@@ -15,12 +16,24 @@ class Message{
 		$msg = array();
 		switch ($key) {
 			case 's':
-				$sql = "select * from sender_box where sender_id = '$user_id'";
-				return $db -> queryArr($sql);
+				$sql = "select * from message_sender_box where sender_id = '$user_id'";
+				$temp = $db -> queryArr($sql);
+				$newUser = new User("id",$user_id);
+				for($i = 0; $i < count($temp); $i ++){
+					$temp1 = $db -> getUserInfo("id",$temp[$i]["receiver_id"]);
+					$temp[$i]["receiver_name"] = $temp1["nickname"];
+				}
+				return $temp;
 			
 			case 'r':
-				$sql = "select * from receiver_box where receiver_id = '$user_id'";
-				return $db -> queryArr($sql);
+				$sql = "select * from message_receiver_box where receiver_id = '$user_id'";
+				$temp = $db -> queryArr($sql);
+				$newUser = new User("id",$user_id);
+				for($i = 0; $i < count($temp); $i ++){
+					$temp1 = $db -> getUserInfo("id",$temp[$i]["sender_id"]);
+					$temp[$i]["sender_name"] = $temp1["nickname"];
+				}
+				return $temp;
 		}
 	}
 
@@ -31,11 +44,11 @@ class Message{
 		$db = MySQL::getInstance();
 		switch ($key) {
 			case 's':
-				$sql = "select * from sender_box where id = '$msg_id'";
+				$sql = "select * from message_sender_box where id = '$msg_id'";
 				return $db -> query($sql);
 			
 			case 'r':
-				$sql = "select * from receiver_box where id = '$msg_id'";
+				$sql = "select * from message_receiver_box where id = '$msg_id'";
 				return $db -> query($sql);
 		}
 	}
@@ -46,12 +59,12 @@ class Message{
 	public function sendMessage($sender_id,$receiver_id,$msg){
 		$db = MySQL::getInstance();
 		
-		$sql = "insert into sender_box(sender_id,receiver_id,message)
+		$sql = "insert into message_sender_box(sender_id,receiver_id,message)
 				values('$sender_id','$receiver_id','$msg')";
 		$db -> query($sql);
 		$flag1 = $db -> affectRows();
 
-		$sql = "insert into receiver_box(sender_id,receiver_id,message)
+		$sql = "insert into message_receiver_box(sender_id,receiver_id,message)
 				values('$sender_id','$receiver_id','$msg')";
 		$db -> query($sql);
 		$flag2 = $db -> affectRows();
@@ -69,12 +82,12 @@ class Message{
 	private function answerMessage($sender_id,$receiver_id,$msg_id,$answer){
 		$db = MySQL::getInstance();
 		
-		$sql = "insert into sender_box(ref_id,sender_id,receiver_id,message)
+		$sql = "insert into message_sender_box(ref_id,sender_id,receiver_id,message)
 				values('$msg_id','$sender_id','$receiver_id','$answer')";
 		$db -> query($sql);
 		$flag1 = $db -> affectRows();
 		
-		$sql =  "insert into receiver_box(ref_id,sender_id,receiver_id,message)
+		$sql =  "insert into message_receiver_box(ref_id,sender_id,receiver_id,message)
 				values('$msg_id','$sender_id','$receiver_id','$answer')";
 		$db -> query($sql);
 		$flag2 = $db -> affectRows();
@@ -117,10 +130,10 @@ class Message{
 //
 	private function operateState($msg_id){
 		$db = MySQL::getInstance();
-		$sql = "select * from receiver_box where id = '$msg_id'";
+		$sql = "select * from message_receiver_box where id = '$msg_id'";
 		$temp = $db -> query($sql);
 		if($temp["state"] == 0){
-			$sql = "update receiver_box set state = '1' where id = '$msg_id'";
+			$sql = "update message_receiver_box set state = '1' where id = '$msg_id'";
 			$db -> query($sql);
 			return $db -> affectRows();
 		}
@@ -141,7 +154,7 @@ class Message{
 					return $this->getMessage("s",$msg_id);
 				}
 				if($op == "delete"){
-					$sql = "delete from sender_box where id = '$msg_id'";
+					$sql = "delete from message_sender_box where id = '$msg_id'";
 					$db -> query($sql);
 					return $db -> affectRows();
 				}
@@ -156,12 +169,12 @@ class Message{
 					return $this->getMessage("r",$msg_id);
 				}
 				if($op == "delete"){
-					$sql = "delete from receiver_box where id = '$msg_id'";
+					$sql = "delete from message_receiver_box where id = '$msg_id'";
 					$db -> query($sql);
 					return $db -> affectRows();
 				}
 				if($op == "answer"){
-					$sql = "select * from receiver_box where id = '$msg_id'";
+					$sql = "select * from message_receiver_box where id = '$msg_id'";
 					$temp = $db -> query($sql);
 					return $this -> answerMessage($user_id,$temp["sender_id"],$msg_id,$answer);
 				}

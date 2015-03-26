@@ -1,8 +1,24 @@
 <?php
+  include_once("../Demo/User.php");
+  use Demo\User;
+  include_once("../Demo/Group.php");
+  use Demo\Group;
+  
   isset($_COOKIE["email"])? $email=$_COOKIE["email"] : $email=null;
+  if($email == null){
+    header("Location:homepage.php");
+    exit();
+  }
 
+  if($_GET["email"] == $email){
+    header("Location:selfpage.php");
+    exit();
+  }
 
-
+//User
+  $newUser = new User($_GET["email"]);
+  $user = $newUser->user;
+  $userId = $user["u_id"];
 ?>
 
 <!DOCTYPE html>
@@ -51,21 +67,151 @@
   </div>
 </div>
 
-<div class="navbar navbar-default" role="navigation">
+
 <div class="container">
-  <ul class="nav navbar-nav">
-    <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Rank</a>
-        <ul class="dropdown-menu" role="menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li class="divider"></li>            
-            <li><a href="#">Something else here</a></li>
+  <div class="row">
+    
+
+    <div class="col-md-3">
+      <div class="user-index">
+        <ul class="nav" role="tablist">
+          <li>
+            <a href="#UserBase">Base Info</a>
+          </li>
+          <li>
+            <a href="#UserFriends">Friends</a>
+          </li>
+          <li>
+            <a href="#UserOwnedGroup">Owned Groups</a>
+          </li>
+          <li>
+            <a href="#UserJoinedGroup">Joined Groups</a>
+          </li>
         </ul>
-    </li>
-  </ul>
+      </div>
+    </div>
+
+
+    <div class="col-md-9">
+      <div class="user-info">
+        <hr>
+        <div id="UserBase">
+          <h3>Base Info</h3>
+          <form method="post" action="../Controller/PraiseAction.php?p=user&id=<?php echo $userId; ?>">
+              <button type="submit" class="btn btn-info">Praise this guy</button>
+          </form>
+          <br>
+          <div class="panel panel-info">
+            <div class="panel-heading">Nickname</div>
+              <div class="panel-body">
+                <div class="col-md-6">    
+                    <?php
+                      echo $user["nickname"];
+                    ?>
+                  <span class="badge">
+                    <span class="glyphicon glyphicon-thumbs-up">
+                      <?php
+                        echo $user["popularity"];
+                      ?>
+                    </span>
+                  </span>
+                </div>
+              </div>
+              <div class="panel-heading">Email</div>
+              <div class="panel-body">
+                <?php
+                  echo $user["email"];
+                ?>
+              </div>
+              <div class="panel-heading">Be Friend</div>
+              <div class="panel-body">
+                <form method="post" action="">
+                  <button type="submit" class="btn btn-danger">Be Friend</button>
+
+                </form>
+                <?php
+                  
+                ?>
+              </div>
+          </div>
+        </div>
+      </div>
+    
+
+
+      <div class="user-friends">
+        <hr>
+        <div id="UserFriends">
+          <h3>Friends</h3>
+        </div>
+        <div class="panel panel-info">
+            <div class="panel-heading">All Friends are Here!</div>
+              <div class="panel-body">
+                <?php
+                  for($i = 0; $i < $friendsCount; $i ++){
+                    $friendEmail = $friendsInfo[$i]["email"];
+                    $friendNickname = $friendsInfo[$i]["nickname"];
+                    echo "<a href='userpage.php?email=$friendEmail'>$friendNickname</a>";
+                    echo "<hr>";
+                  }
+                ?>
+              </div>
+            </div>
+      </div>
+
+
+      <div class="user-owned-group">
+        <hr>
+        <div id="UserOwnedGroup">
+          <h3>Owned Groups</h3>
+        </div>
+        <div class="panel panel-info">
+            <div class="panel-heading">All Groups are Here!</div>
+              <div class="panel-body">
+                <?php
+                  for($i = 0; $i < count($ownedGroup); $i ++){
+                    $ownedGroupId = $ownedGroup[$i]["g_id"];
+                    $ownedGroupName = $ownedGroup[$i]["g_name"];
+                    echo "<a href='skimgroup.php?groupid=$ownedGroupId'>$ownedGroupName</a>";
+                    echo "<hr>";
+                  }
+                ?>
+              </div>
+            </div>
+      </div>
+
+
+      <div class="user-joined-group">
+        <hr>
+        <div id="UserJoinedGroup">
+          <h3>Joined Groups</h3>
+        </div>
+        <div class="panel panel-info">
+            <div class="panel-heading">All Groups are Here!</div>
+              <div class="panel-body">
+                <?php
+                  for($i = 0; $i < count($joinedGroup); $i ++){
+                    $joinedGroupId = $joinedGroup[$i]["g_id"];
+                    $joinedGroupName = $joinedGroup[$i]["g_name"];
+                    echo "<a href='skimgroup.php?groupid=$joinedGroupId'>$joinedGroupName</a>";
+                    echo "<hr>";
+                  }
+                ?>
+              </div>
+            </div>
+      </div>
+    </div>
+
+
+
+
+
+
+
+  </div>
 </div>
-</div>
+
+
 
 
 

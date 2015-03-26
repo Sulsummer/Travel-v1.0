@@ -1,5 +1,15 @@
 <?php
+  include_once("../Demo/User.php");
+  use Demo\User;
+  
+  isset($_COOKIE["email"])? $email=$_COOKIE["email"] : $email=null;
+  if($email == null){
+    header("Location:homepage.php");
+    exit();
+  }
 
+  $new = new User($email);
+  $self = $new->user;
 
 
 
@@ -37,7 +47,14 @@
             <a href="javascript:void(0)">Search</a>
           </li>
           <li>
-          	<a href="sign.php">Sign in/up</a>        
+          	<?php
+              if($email==null){
+                echo "<a href='sign.php'>Sign in/up</a>";
+              }
+              else{
+                echo "<a href='selfpage.php?email=$email'>$email</a>";
+              }
+            ?>       
           </li>
         </ul>
       </div>
@@ -59,7 +76,7 @@
       	<p>Here comes travel notes.</p>
       </div>
       <div class="col-md-6">
-      	<a href="group.php"><h2>Travel Groups</h2></a>
+      	<a href="skimgroup.php"><h2>Travel Groups</h2></a>
       	<p>Here comes travel groups.</p>
       </div>
     </div>

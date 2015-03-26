@@ -49,7 +49,21 @@
   </div>
 </div>
 
-<div class="navbar"></div>
+<div class="navbar navbar-default" role="navigation">
+<div class="container">
+  <ul class="nav navbar-nav">
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Rank</a>
+        <ul class="dropdown-menu" role="menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li class="divider"></li>            
+            <li><a href="#">Something else here</a></li>
+        </ul>
+    </li>
+  </ul>
+</div>
+</div>
 
 <div class="container">
   

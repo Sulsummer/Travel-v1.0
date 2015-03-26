@@ -11,15 +11,12 @@ class Group{
 		switch ($key) {
 			case 'group_name':
 				$sql = "select * from groups where g_name ='$value'";
-				$group_info = $db -> query($sql);
-				break;
+				return $group_info = $db -> query($sql);
 			
 			case 'group_id':
 				$sql = "select * from groups where g_id = '$value'";
-				$group_info = $db -> query($sql);
-				break;
+				return $group_info = $db -> query($sql);
 		}
-		return $group_info;
 	}
 //
 //得到一个user建立的所有group
@@ -31,12 +28,20 @@ class Group{
 	}
 
 //
-//得到一个user加入的所有group，包括自己建立的
+//得到一个user加入的所有group，不包括自己建立的
 //
 	public function getAllGroup($user_id){
 		$db = MySQL::getInstance();
 		$sql = "select * from group_members where m_id = '$user_id'";
-		return $db -> queryArr($sql);
+		$temp = $db -> queryArr($sql);
+
+		$groupArray = array();
+		for($i = 0; $i < count($temp); $i ++){
+			$groupid = $temp[$i]["g_id"];
+			$sql = "select * from groups where g_id = '$groupid'";
+			array_push($groupArray, $db->query($sql));
+		}
+		return $groupArray;
 	}
 
 
@@ -120,6 +125,34 @@ class Group{
 				values ('$g_id','$u_id','$ref_id','$comment')";
 		$db -> query($sql);
 		return $db -> affectRows();
+	}
+
+//
+//收藏小组
+//
+	public function collectGroup($group_id,$user_id){
+		$db = MySQL::getInstance();
+		$sql = "insert into user_group_collection(u_id,g_id)
+				values ('$user_id','$group_id')";
+		$db -> query($sql);
+		return $db -> affectRows();
+	}
+
+//
+//点赞小组
+//
+	public function praiseGroup($group_id,$user_id){
+		$db = MySQL::getInstance();
+		$sql = "insert into user_group_praise(g_id,u_id)
+				values ('$group_id','$user_id')";
+		$db -> query($sql);
+		$flag1 = $db -> affectRows();
+		$group_info = $this->getGroupInfo("group_id",$group_id);
+		$popularity = $group_info["popularity"] + 1;
+		$sql = "update groups set popularity = '$popularity' where g_id = '$group_id'";
+		$db -> query($sql);
+		$flag2 = $db -> affectRows();
+		return $flag1 && $flag2;
 	}
 
 //
